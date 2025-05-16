@@ -12,23 +12,9 @@ fn main() {
     let dkp = env::var("DEVKITPRO").expect("Please provided DEVKITPRO via env variables");
     let ppc = env::var("DEVKITPPC").expect("Please provided DEVKITPPC via env variables");
 
-    println!("{link_search_path}={ppc}/powerpc-eabi/lib",);
-    println!("{link_search_path}={ppc}/lib/gcc/powerpc-eabi/13.1.0");
-    println!("{link_search_path}={dkp}/wut/lib");
     println!("{link_search_path}={dkp}/wums/lib");
-
     println!("{link_lib}=kernel");
-    println!("{link_lib}=wut");
-    println!("{link_lib}=m");
-    println!("{link_lib}=c");
-    println!("{link_lib}=g");
-    println!("{link_lib}=gcc");
-    println!("{link_lib}=sysbase");
 
-    /*
-     * These bindings will create many errors since the target cpu is a 32bit system and the host (the compilation PC) is likely a 64bit system.
-     * There are alignment and size checks which will fail, because pointers have different sizes.
-     */
     let bindings = bindgen::Builder::default()
         .use_core()
         .header("src/wrapper.h")
@@ -43,7 +29,6 @@ fn main() {
         .clang_args(vec![
             "--target=powerpc-none-eabi",
             &format!("--sysroot={ppc}/powerpc-eabi"),
-            // "-xc++",
             "-m32",
             "-mfloat-abi=hard",
             &format!("-I{dkp}/wums/include/kernel"),
@@ -52,19 +37,6 @@ fn main() {
             "-Wno-return-type-c-linkage", // ig we can ignore these
         ])
         .allowlist_file(".*/wums/include/kernel/.*.h")
-        // in case we need some special symbols from different files
-        // .header_contents(
-        //     "single_symbols.h",
-        //     r#"
-        //         #pragma once
-        //         #include <unistd.h>
-        //         #include <errno.h>
-        //     "#,
-        // )
-        // .allowlist_function("close")
-        // .allowlist_function("__errno")
-        // .allowlist_var("^E[A-Z0-9_]+$")
-        //
         .raw_line("#![allow(non_upper_case_globals)]")
         .raw_line("#![allow(non_camel_case_types)]")
         .raw_line("#![allow(non_snake_case)]")

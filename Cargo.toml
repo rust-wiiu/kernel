@@ -17,4 +17,4 @@ crate-type = ["lib"]
 bindgen = "0.71.1"
 
 [dependencies]
-wut = { git = "https://github.com/rust-wiiu/kernel" }
+wut = { git = "https://github.com/rust-wiiu/kernel", branch = "main" }
